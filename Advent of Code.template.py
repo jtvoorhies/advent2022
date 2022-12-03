@@ -5,6 +5,7 @@ from enum import Enum, auto
 # global variable to make functions more chatty for debugging
 verbose = True
 
+
 class InputProvider(Enum):
     """The function getInput() is the star here, giving you the input string to
     work with."""
@@ -18,13 +19,8 @@ class InputProvider(Enum):
     TODO: fill in
 """
             case InputProvider.INPUTFILE:
-                 inputFile = open("input.txt", mode="rt")
-                 return inputFile.read()
-
-
-def solve(input, part=1):
-    # TODO Write solution
-    return -1
+                inputFile = open("input.txt", mode="rt")
+                return inputFile.read()
 
 
 def run(inputProvider, part=1, expectedSolution=()):
@@ -33,15 +29,22 @@ def run(inputProvider, part=1, expectedSolution=()):
         raise ValueError("parameter 'part' must be a one or two.")
     finishChar = "🏁"
     solutionUnderTest = solve(inputProvider.getInput(), part=part)
-    if expectedSolution is not None:
+    if expectedSolution != ():
         if expectedSolution == solutionUnderTest:
             finishChar = "✅"
         else:
             finishChar = "❌"
-    print(finishChar, "Solution found:", solutionUnderTest, "  expected:", str(expectedSolution), "\n")
+    print(finishChar, "Solution found:", solutionUnderTest,
+          "  expected:", str(expectedSolution), "\n")
+
+
+def solve(input, part=1):
+    # TODO Write solution
+    return -1
+
 
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution=12345)
-#run(InputProvider.INPUTFILE, part=1, expectedSolution=)
-#run(InputProvider.EXAMPLE, part=2, expectedSolution=)
-#run(InputProvider.INPUTFILE, part=2, expectedSolution=)
+# run(InputProvider.INPUTFILE, part=1)
+# run(InputProvider.EXAMPLE, part=2, expectedSolution=)
+# run(InputProvider.INPUTFILE, part=2)
