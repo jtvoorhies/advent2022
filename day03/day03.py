@@ -16,7 +16,12 @@ class InputProvider(Enum):
         match self:
             case InputProvider.EXAMPLE:
                 return """\
-    TODO: fill in
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
 """
             case InputProvider.INPUTFILE:
                 inputFile = open("input.txt", mode="rt")
@@ -44,7 +49,7 @@ def solve(input, part=1):
 
 
 # TODO: fill in example solution
-run(InputProvider.EXAMPLE, part=1, expectedSolution=12345)
+run(InputProvider.EXAMPLE, part=1, expectedSolution=157)
 # run(InputProvider.INPUTFILE, part=1)
 # run(InputProvider.EXAMPLE, part=2, expectedSolution=)
 # run(InputProvider.INPUTFILE, part=2)
