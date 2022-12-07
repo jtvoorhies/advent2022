@@ -4,7 +4,11 @@ import re
 from enum import Enum, auto
 
 
-lineParser = re.compile("\([ABC]\) \([XYZ]\)")
+verbose = False
+
+
+lineParser = re.compile('([ABC]) ([XYZ])')
+
 
 class Rps(Enum):
     '''The choice to make in each round of this game.'''
@@ -32,12 +36,16 @@ class Outcome(Enum):
             case Outcome.TIE: return 3
 
 
-def lineToPointsa(line: str) -> inn:
-    '''Take a single line of puzzle input and determine amount awarded to me.'''
+def lineToPoints(line: str) -> int:
+    '''Takes line of puzzle input and determines points awarded to me.'''
     playMatcher = lineParser.search(line)
-    opPlayCh, myPlayCh = playMatcher.group(1), playMatcher.group(2)
-    # opPlay, myPlay = pass, pass
-    opPlay = Error
+    if verbose:
+        print("lineToPointsλ type(lineParser):", type(lineParser),
+              " type(playMatcher):", type(playMatcher))
+    opPlayCh = playMatcher.group(1)
+    myPlayCh = playMatcher.group(2)
+    opPlay: Rps
+    myPlay: Rps
     match opPlayCh:
         case "A": opPlay = Rps.ROCK
         case "B": opPlay = Rps.PAPER
@@ -46,3 +54,65 @@ def lineToPointsa(line: str) -> inn:
         case "X": myPlay = Rps.ROCK
         case "Y": myPlay = Rps.PAPER
         case "Z": myPlay = Rps.SCISSORS
+    outcome: Outcome
+    match opPlay.pointValue() - myPlay.pointValue():
+        case -2: outcome = Outcome.LOSE
+        case -1: outcome = Outcome.WIN
+        case 0: outcome = Outcome.TIE
+        case 1: outcome = Outcome.LOSE
+        case 2: outcome = Outcome.WIN
+    myPointsEarned = outcome.pointValue() + myPlay.pointValue()
+    if verbose:
+        print("lineToPointsλ opPlay:", opPlay, " myPlay:", myPlay,
+              " outcome:", outcome)
+        print("    myPointsEarned:", myPointsEarned)
+    return myPointsEarned
+
+
+class InputProvider(Enum):
+    EXAMPLE = auto()
+    FILE = auto()
+
+    def getInput(self) -> str:
+        match self:
+            case InputProvider.EXAMPLE: return '''\
+A Y
+B X
+C Z
+'''
+            case InputProvider.FILE:
+                file = open("input.txt")
+                return file.read()
+
+
+def run(inputProvider: InputProvider, part=1, expectedSolution=()):
+    print("Solving part", part, "for", inputProvider)
+    if (part < 1) or (part > 2):
+        raise ValueError("parameter 'part' must be a one or two.")
+    finishChar = "🏁"
+    solutionUnderTest = solve(inputProvider.getInput(), part=part)
+    if expectedSolution != ():
+        if expectedSolution == solutionUnderTest:
+            finishChar = "✅"
+        else:
+            finishChar = "❌"
+    print(finishChar, "Solution found:", solutionUnderTest,
+          "  expected:", str(expectedSolution), "\n")
+
+
+def solve(input: str, part: int) -> int:
+    myPoints = 0
+    splitByLine = input.splitlines()
+    for line in splitByLine:
+        pointsForLine = lineToPoints(line)
+        myPoints += pointsForLine
+        if verbose:
+            print("solveλ line:", line, "  points:", pointsForLine,
+                  "current total:", myPoints)
+    return myPoints
+
+
+run(InputProvider.EXAMPLE, part=1, expectedSolution=15)
+run(InputProvider.FILE, part=1)
+# run(InputProvider.EXAMPLE, part=2, expectedSolution=12)
+# run(InputProvider.FILE, part=2)
