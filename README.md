@@ -7,8 +7,8 @@ GitHub repo: jtvoorhies/advent2022
 ## Progress
 
 - [x] #01 Calorie Counting
-- [ ] #02 Rock Paper Scissors
-- [ ] #03
+- [x] #02 Rock Paper Scissors
+- [ ] #03 Rucksack Reorganization
 - [ ] #04
 - [ ] #05
 - [ ] #06
