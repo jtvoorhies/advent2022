@@ -8,8 +8,8 @@ GitHub repo: jtvoorhies/advent2022
 
 - [x] #01 Calorie Counting
 - [x] #02 Rock Paper Scissors
-- [ ] #03 Rucksack Reorganization
-- [ ] #04
+- [x] #03 Rucksack Reorganization
+- [ ] #04 Camp Cleanup
 - [ ] #05
 - [ ] #06
 - [ ] #07

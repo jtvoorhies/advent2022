@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 
+
 # global variable to make functions more chatty for debugging
 verbose = True
 
@@ -16,7 +17,12 @@ class InputProvider(Enum):
         match self:
             case InputProvider.EXAMPLE:
                 return """\
-    TODO: fill in
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
 """
             case InputProvider.INPUTFILE:
                 inputFile = open("input.txt", mode="rt")
@@ -40,11 +46,11 @@ def run(inputProvider, part=1, expectedSolution=()):
 
 def solve(input, part=1) -> int:
     # TODO Write solution
-    pass
+    return -1
 
 
 # TODO: fill in example solution
-run(InputProvider.EXAMPLE, part=1, expectedSolution=12345)
+run(InputProvider.EXAMPLE, part=1, expectedSolution=2)
 # run(InputProvider.INPUTFILE, part=1)
 # run(InputProvider.EXAMPLE, part=2, expectedSolution=)
 # run(InputProvider.INPUTFILE, part=2)

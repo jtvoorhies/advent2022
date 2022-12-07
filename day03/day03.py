@@ -50,7 +50,9 @@ def getPriority(char: chr) -> int:
     return idx + 1
 
 
-def solve(input, part=1):
+def solve(input, part=1) -> int:
+    if part == 2:
+        return solvePart2(input)
     splitByLine = input.splitlines()
     prioritySum = 0
     for line in splitByLine:
@@ -74,8 +76,27 @@ def solve(input, part=1):
     return prioritySum
 
 
+def solvePart2(input: str) -> int:
+    prioritySum = 0
+    splitByLine = input.splitlines()
+    for groupOf3Start in range(len(splitByLine))[::3]:
+        first = set(splitByLine[groupOf3Start])
+        second = set(splitByLine[groupOf3Start + 1])
+        third = set(splitByLine[groupOf3Start + 2])
+        commonItemSet = first & second & third
+        assert len(commonItemSet) == 1
+        commonItem = commonItemSet.pop()
+        priority = getPriority(commonItem)
+        prioritySum += priority
+        if verbose:
+            print("solvePart2λ groupOf3Start:", groupOf3Start,
+                  "commonItem:", commonItem, "priority:", priority,
+                  "prioritySum:", prioritySum)
+    return prioritySum
+
+
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution=157)
 run(InputProvider.INPUTFILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=70)
-# run(InputProvider.INPUTFILE, part=2)
+run(InputProvider.EXAMPLE, part=2, expectedSolution=70)
+run(InputProvider.INPUTFILE, part=2)
