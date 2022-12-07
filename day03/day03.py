@@ -3,7 +3,7 @@
 from enum import Enum, auto
 
 # global variable to make functions more chatty for debugging
-verbose = True
+verbose = False
 
 
 class InputProvider(Enum):
@@ -43,13 +43,39 @@ def run(inputProvider, part=1, expectedSolution=()):
           "  expected:", str(expectedSolution), "\n")
 
 
+def getPriority(char: chr) -> int:
+    '''Convert parameter character (a-z,A-Z) to priority number.'''
+    allLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    idx = allLetters.index(char)
+    return idx + 1
+
+
 def solve(input, part=1):
-    # TODO Write solution
-    return -1
+    splitByLine = input.splitlines()
+    prioritySum = 0
+    for line in splitByLine:
+        # cut in half with bitshift right
+        lengthOfSack = len(line) >> 1
+        leftSackStr = line[:lengthOfSack]
+        rightSackStr = line[lengthOfSack:]
+        if verbose:
+            print("solveλ L:", leftSackStr)
+            print("       R:", rightSackStr)
+        leftSack = set(leftSackStr)
+        rightSack = set(rightSackStr)
+        shared = leftSack & rightSack
+        assert len(shared) == 1
+        sharedItem: chr = shared.pop()
+        priority = getPriority(sharedItem)
+        prioritySum += priority
+        if verbose:
+            print("solveλ sharedItem:", sharedItem, " priority:", priority,
+                  "        prioritySum:", prioritySum)
+    return prioritySum
 
 
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution=157)
-# run(InputProvider.INPUTFILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=)
+run(InputProvider.INPUTFILE, part=1)
+# run(InputProvider.EXAMPLE, part=2, expectedSolution=70)
 # run(InputProvider.INPUTFILE, part=2)
