@@ -1,51 +1,48 @@
 # Advent of Code Day 2: Rock Paper Scissors
 
+import re
 from enum import Enum, auto
 
-# global variable to make functions more chatty for debugging
-verbose = True
 
+lineParser = re.compile("\([ABC]\) \([XYZ]\)")
 
-class InputProvider(Enum):
-    """The function getInput() is the star here, giving you the input string to
-    work with."""
-    EXAMPLE = auto()
-    INPUTFILE = auto()
+class Rps(Enum):
+    '''The choice to make in each round of this game.'''
+    ROCK = auto()
+    PAPER = auto()
+    SCISSORS = auto()
 
-    def getInput(self) -> str:
+    def pointValue(self) -> int:
         match self:
-            case InputProvider.EXAMPLE:
-                return """\
-A Y
-B X
-C Z
-"""
-            case InputProvider.INPUTFILE:
-                inputFile = open("input.txt", mode="rt")
-                return inputFile.read()
+            case Rps.ROCK: return 1
+            case Rps.PAPER: return 2
+            case Rps.SCISSORS: return 3
 
 
-def run(inputProvider, part=1, expectedSolution=()):
-    print("Solving part", part, "for", inputProvider)
-    if (part < 1) or (part > 2):
-        raise ValueError("parameter 'part' must be a one or two.")
-    finishChar = "🏁"
-    solutionUnderTest = solve(inputProvider.getInput(), part=part)
-    if expectedSolution != ():
-        if expectedSolution == solutionUnderTest:
-            finishChar = "✅"
-        else:
-            finishChar = "❌"
-    print(finishChar, "Solution found:", solutionUnderTest,
-          "  expected:", str(expectedSolution), "\n")
+class Outcome(Enum):
+    '''The 3 possible outcomes of Rock Paper Scissors'''
+    WIN = auto()
+    LOSE = auto()
+    TIE = auto()
+
+    def pointValue(self) -> int:
+        match self:
+            case Outcome.WIN: return 6
+            case Outcome.LOSE: return 0
+            case Outcome.TIE: return 3
 
 
-def solve(input, part=1):
-    # TODO Write solution
-    return -1
-
-
-run(InputProvider.EXAMPLE, part=1, expectedSolution=15)
-# run(InputProvider.INPUTFILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=)
-# run(InputProvider.INPUTFILE, part=2)
+def lineToPointsa(line: str) -> inn:
+    '''Take a single line of puzzle input and determine amount awarded to me.'''
+    playMatcher = lineParser.search(line)
+    opPlayCh, myPlayCh = playMatcher.group(1), playMatcher.group(2)
+    # opPlay, myPlay = pass, pass
+    opPlay = Error
+    match opPlayCh:
+        case "A": opPlay = Rps.ROCK
+        case "B": opPlay = Rps.PAPER
+        case "C": opPlay = Rps.SCISSORS
+    match myPlayCh:
+        case "X": myPlay = Rps.ROCK
+        case "Y": myPlay = Rps.PAPER
+        case "Z": myPlay = Rps.SCISSORS
