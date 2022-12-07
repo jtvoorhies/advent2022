@@ -89,3 +89,9 @@ Following the Elf's instructions for the second column, /what would your total
 score be if everything goes exactly according to your strategy guide?/
 
 ** Solution
+=11998=
+That's the right answer! You are one gold star closer to collecting enough star fruit.
+
+You have completed Day 2! You can [Shareon
+[[https://twitter.com/intent/tweet?text=I+just+completed+%22Rock+Paper+Scissors%22+%2D+Day+2+%2D+Advent+of+Code+2022&url=https%3A%2F%2Fadventofcode%2Ecom%2F2022%2Fday%2F2&related=ericwastl&hashtags=AdventOfCode][Twitter]]
+[[javascript:void(0);][Mastodon]]] this victory or [[https://adventofcode.com/2022][[Return to Your Advent Calendar]]].

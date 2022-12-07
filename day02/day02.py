@@ -69,6 +69,51 @@ def lineToPoints(line: str) -> int:
     return myPointsEarned
 
 
+def playAgainstForOutcome(opPlay: Rps, outcome: Outcome) -> Rps:
+    match outcome:
+        case Outcome.WIN:
+            match opPlay:
+                case Rps.ROCK:
+                    return Rps.PAPER
+                case Rps.PAPER:
+                    return Rps.SCISSORS
+                case Rps.SCISSORS:
+                    return Rps.ROCK
+        case Outcome.LOSE:
+            match opPlay:
+                case Rps.ROCK:
+                    return Rps.SCISSORS
+                case Rps.PAPER:
+                    return Rps.ROCK
+                case Rps.SCISSORS:
+                    return Rps.PAPER
+        case Outcome.TIE:
+            return opPlay
+
+
+def lineToPointsPart2(line: str) -> int:
+    playMatcher = lineParser.search(line)
+    opPlayCh = playMatcher.group(1)
+    myOutcomeCh = playMatcher.group(2)
+    opPlay: Rps
+    myOutcome: Rps
+    match opPlayCh:
+        case "A": opPlay = Rps.ROCK
+        case "B": opPlay = Rps.PAPER
+        case "C": opPlay = Rps.SCISSORS
+    match myOutcomeCh:
+        case "X": myOutcome = Outcome.LOSE
+        case "Y": myOutcome = Outcome.TIE
+        case "Z": myOutcome = Outcome.WIN
+    myPlay: Rps = playAgainstForOutcome(opPlay, myOutcome)
+    myPointsEarned = myOutcome.pointValue() + myPlay.pointValue()
+    if verbose:
+        print("lineToPointsPart2λ opPlay:", opPlay, " myOutcome:", myOutcome,
+              " myPlay:", myPlay)
+        print("    myPointsEarned:", myPointsEarned)
+    return myPointsEarned
+
+
 class InputProvider(Enum):
     EXAMPLE = auto()
     FILE = auto()
@@ -104,7 +149,11 @@ def solve(input: str, part: int) -> int:
     myPoints = 0
     splitByLine = input.splitlines()
     for line in splitByLine:
-        pointsForLine = lineToPoints(line)
+        pointsForLine: int
+        if part == 1:
+            pointsForLine = lineToPoints(line)
+        elif part == 2:
+            pointsForLine = lineToPointsPart2(line)
         myPoints += pointsForLine
         if verbose:
             print("solveλ line:", line, "  points:", pointsForLine,
@@ -114,5 +163,5 @@ def solve(input: str, part: int) -> int:
 
 run(InputProvider.EXAMPLE, part=1, expectedSolution=15)
 run(InputProvider.FILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=12)
-# run(InputProvider.FILE, part=2)
+run(InputProvider.EXAMPLE, part=2, expectedSolution=12)
+run(InputProvider.FILE, part=2)
