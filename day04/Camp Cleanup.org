@@ -67,4 +67,34 @@ example, there are =2= such pairs.
 
 To begin, [[./input.txt][get your puzzle input]].
 
-** Notes
+** Solution
+=604=
+
+That's not the right answer; your answer is too high. If you're stuck, make sure
+you're using the full input data; there are also some general tips on the [[https://adventofcode.com/2022/about][about
+page]], or you can ask for hints on the [[https://www.reddit.com/r/adventofcode/][subreddit]]. Please wait one minute before
+trying again. (You guessed =604=.) [[https://adventofcode.com/2022/day/4][[Return to Day 4]]]
+
+
+=582=
+
+That's the right answer! You are one gold star closer to collecting enough star fruit. [[https://adventofcode.com/2022/day/4#part2][[Continue to Part Two]]]
+
+* Part 2
+It seems like there is still quite a bit of duplicate work planned.  Instead, the
+Elves would like to know the number of pairs that /overlap at all/.
+
+In the above example, the first two pairs (=2-4,6-8= and =2-3,4-5=) don't
+overlap, while the remaining four pairs (=5-7,7-9=, =2-8,3-7=, =6-6,4-6=, and
+=2-6,4-8=) do overlap:
+
+- =5-7,7-9= overlaps in a single section, =7=.
+- =2-8,3-7= overlaps all of the sections =3= through =7=.
+- =6-6,4-6= overlaps in a single section, =6=.
+- =2-6,4-8= overlaps in sections =4=, =5=, and =6=.
+
+So, in this example, the number of overlapping assignment pairs is =4=.
+
+/In how many assignment pairs do the ranges overlap?/
+
+** Solution
