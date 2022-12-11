@@ -5,7 +5,10 @@ import re
 
 
 # global variable to make functions more chatty for debugging
-verbose = True
+verbose = False
+# parsing each line of input
+# I don't know why pycode style says \d in invalid escape sequence; it's works
+inputLineRegEx = re.compile('(\d+)-(\d+),(\d+)-(\d+)')
 
 
 class InputProvider(Enum):
@@ -44,73 +47,60 @@ def run(inputProvider, part=1, expectedSolution=()):
     print(finishChar, "Solution found:", solutionUnderTest,
           "  expected:", str(expectedSolution), "\n")
 
+
 class InclusiveBounds:
+
     def __init__(self, start: int, last: int):
+        # I was comparing 'str's and not 'int's before!
+        # The type hints above didn't raise any flags.  So what am I not doing
+        # to utilize them?
+        assert start.__class__ == int
+        assert last.__class__ == int
         self.start = start
         self.last = last
+
     def __str__(self):
         return "{0}-{1}".format(self.start, self.last)
-    # @total_ordering methods considered
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
         return (self.start, self.last) == (other.start, other.last)
-    # moving to inside the class
-    # def contains(self, other) -> bool:
-    #     if type(self) != type(other):
-    #         return NotImplemented
-    #     print("wtf:")
-    #     print(self.start <= other.start and self.last >= other.last)
-    #     return self.start <= other.start and self.last >= other.last
 
 
 def enclosingPair(left: InclusiveBounds, right: InclusiveBounds) -> bool:
     '''Tests pair to see if either contains the right.'''
-    # print("enclosingPairλ", left, right)
-    # print("left.start:", left.start, "left.last:", left.last,
-    #       " right.start", right.start, "right.last:", right.last)
-    # testA = left.start <= right.start
-    # print("testA = left.start <= right.start:", testA)
-    # testB = left.last >= right.last
-    # print("testB = left.last >= right.last:", testB)
-    # testC = left.start >= right.start
-    # print("testC = left.start >= right.start:", testC)
-    # testD = left.last <= right.last
-    # print("testD = left.last <= right.last:", testD)
-    # test1 = (left.start <= right.start) and (left.last >= right.last)
-    # test2 = left.start >= right.start and left.last <= right.last
-    # print("test1:", test1, '    left.start <= right.start and left.last >= right.last')
-    # print("test2:", test2, '    left.start >= right.start and left.last <= right.last')
     return (left.start <= right.start and left.last >= right.last)\
         or (left.start >= right.start and left.last <= right.last)
 
 
-inputLineRegEx = re.compile('(\d+)-(\d+),(\d+)-(\d+)')
+def overlappingPair(left: InclusiveBounds, right: InclusiveBounds) -> bool:
+    return not ((left.start > right.last) or (left.last < right.start))
 
 
 def solve(input, part=1) -> int:
     splitByLine = input.splitlines()
-    rangePairs: [(InclusiveBounds, InclusiveBounds)] = []
-    countOfFullyContainedPairs = 0
+    counterForSolution = 0
     for line in splitByLine:
         matcher = inputLineRegEx.search(line)
-        # I'm comparing strings and nto ints?
-        # leftRange = InclusiveBounds(matcher.groups()[0], matcher.groups()[1])
-        # rightRange = InclusiveBounds(matcher.groups()[2], matcher.groups()[3])
+        # I've been comparing strings and not ints!  Convert to ints.
         groups = list(map(lambda s: int(s), matcher.groups()))
         # if verbose:
         #     print("solveλ groups after map:", groups)
         leftRange = InclusiveBounds(groups[0], groups[1])
         rightRange = InclusiveBounds(groups[2], groups[3])
-        if enclosingPair(leftRange, rightRange):
-        # if leftRange.contains(rightRange):
+        solveFunction = enclosingPair
+        if part == 2:
+            solveFunction = overlappingPair
+        if solveFunction(leftRange, rightRange):
             if verbose:
-                print("solveλ MATCH FOUND:", line, "   ", leftRange, "   ", rightRange)
-            countOfFullyContainedPairs += 1
-    return countOfFullyContainedPairs
+                print("solveλ MATCH FOUND:",
+                      line, "   ", leftRange, "   ", rightRange)
+            counterForSolution += 1
+    return counterForSolution
 
 
 run(InputProvider.EXAMPLE, part=1, expectedSolution=2)
-run(InputProvider.INPUTFILE, part=1)
+run(InputProvider.INPUTFILE, part=1, expectedSolution=582)
 run(InputProvider.EXAMPLE, part=2, expectedSolution=4)
-# run(InputProvider.INPUTFILE, part=2)
+run(InputProvider.INPUTFILE, part=2)
