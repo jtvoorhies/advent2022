@@ -1,9 +1,7 @@
 # Advent of Code 2022 day 05 "Supply Stacks"
 
 from enum import Enum, auto
-from more_itertools import chunked
 import re
-import sys
 
 # global variable to make functions more chatty for debugging
 verbose = True
@@ -56,55 +54,6 @@ class Dock:
     def __init__(self, stacks: [[str]]):
         self.stacks = stacks
 
-    STACKLABELMATCHER = re.compile(" ([0-9]+)\s*$")
-
-    @staticmethod
-    def fromLines(input: [str]):
-        '''Create a new Dock from lines of input.  Parameter should be [str]'''
-        print("fromLinesλ =====")
-        print(input)
-        print("---------")
-        # look at numeric labels on line just before partition line.  That will
-        # tell how many stacks we need
-        labelLine: str = input[-1]
-        print("Dock.fromLinesλ type(labelLine):", type(labelLine),
-              "  content of labelLine starts on next line.\n", labelLine)
-        lastLabelMatch = Dock.STACKLABELMATCHER.search(labelLine)
-        if not lastLabelMatch:
-            print("Unable to find a match in the labelLine",
-                file=sys.stderr)
-        print("Dock.fromLinesλ type(lastLabelMatch) is:", type(lastLabelMatch))
-        lastStackLabel = int(lastLabelMatch.group()[1])
-        print("Dock.fromLinesλ lastStackLabel:", lastStackLabel)
-
-        myStacks = list(list())
-        # initialize myStacks with empty stacks, count equal to last label
-        for n in range(lastStackLabel):
-            myStacks.append(list())
-
-        print("Dock.fromLinesλ myStacks:", myStacks)
-        checkMatcherRegEx = re.compile('\[([A-Z])\]')
-        for line in input:
-            chunkedLine = chunked(line, 4)
-
-            i = 0
-            for chunkl in chunkedLine:
-                chunk = str(chunkl)
-                lBracket = chunk.find('[')
-                if lBracket > -1:
-                    crateIndex = lBracket + 1
-                    crate = chunk[crateIndex]
-                    print('Found crate:', crate, 'in chunk:', chunk, "from chunkl:", chunkl)
-                    myStacks[i].append(crate)
-                i = i + 1
-
-        # reverse stacks
-        for stack in myStacks:
-            stack.reverse()
-        # return Dock
-        dock = Dock(myStacks)
-        return dock
-
     def stackCount(self) -> int:
         '''Total number of stacks.'''
         return len(self.stacks)
@@ -124,22 +73,14 @@ class Dock:
         return output
 
     def move(self, count: int, fromStack: int, toStack: int):
-        '''The fromStack/toStack will be decremented by 1 because input is
-        1-based index while python list is 0-based index.'''
-        assert type(count) == int, count >= 0
-        assert type(fromStack) == int, fromStack in range(1, self.stackCount() + 1)
-        assert type(toStack) == int, toStack in range(1, self.stackCount() + 1)
-        print("Dock.moveλ =====  {0:>4d},  {1:>4d} ➙ {2:>4d}"\
-              .format(count, fromStack, toStack), "  =====")
-        # self.prettyPrint()
-        # the slice makes a new list.
-        moveables = self.stacks[fromStack - 1][-count:]
-        del self.stacks[fromStack - 1][-count:]
-        moveables.reverse
-        self.stacks[toStack - 1].extend(moveables)
+        if verbose:
+            print("Dock.moveλ {0:>4d}, {1:>4d} ➙ {2:>4d}"\
+                  .format(count, fromStack, toStack))
+        for x in range(0, count):
+            cargo = self.stacks[fromStack - 1].pop()
+            self.stacks[toStack - 1].append(cargo)
 
     def prettyPrint(self):
-        # print("prettyPrintλ self.stacks:", self.stacks)
         for level in range(self.maxStackHeight() - 1, -1, -1):
             filteredIndexes = []
             for index, aStack in enumerate(self.stacks):
@@ -159,11 +100,15 @@ class Dock:
 
 
 def makeDock(input: [str]) -> Dock:
+    '''Creates an Dock instance out of the input strings from the top through
+    to the numbered labels under the cargo.  Do not include the "move"
+    lines.'''
     labelLine = input.pop()
     MATCHER = re.compile(' ([0-9]+)$')
     labelMatched = MATCHER.search(labelLine).group()[1]
     stackCount = int(labelMatched)
-    print('🚢 makeDock: ', stackCount)
+    if verbose:
+        print('🚢 makeDock: ', stackCount)
 
     myStacks = list()
     firstCargosLine = input.pop()
@@ -181,7 +126,8 @@ def makeDock(input: [str]) -> Dock:
             newStack = list(cargo)
         myStacks.append(newStack)
 
-    print("myStacks:", myStacks)
+    if verbose:
+        print("myStacks:", myStacks)
 
     while len(input) > 0:
         cargosLine = input.pop()
@@ -197,12 +143,14 @@ def makeDock(input: [str]) -> Dock:
                     cargoIdx = lBracket + 1
                     cargo = lineSlice[cargoIdx:rBracketIdx]
                     myStacks[stack].append(cargo)
-            print("myStacks:", myStacks)
+            if verbose:
+                print("myStacks:", myStacks)
 
     return Dock(myStacks)
 
 
 class Move:
+    '''count: int, fromStack: int, toStack: int'''
 
     MOVELINEREGEX = re.compile("move ([0-9]+) from ([0-9]+) to ([0-9]+)")
 
@@ -235,8 +183,7 @@ def solve(input, part=1) -> str:
     for move in moves:
         dock.move(move.count, move.fromStack, move.toStack)
         if verbose:
-            print("solveλ move count: {0: >2} fromStack: {1: >2} toStack: {2: >2}"\
-                  .format(move.count, move.fromStack, move.toStack))
+            dock.prettyPrint()
     return dock.topCrateInEachStack()
 
 
