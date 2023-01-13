@@ -91,3 +91,8 @@ stack?/
 To begin, [[./input.txt][get your puzzle input]].
 
 ** Notes
+Python's list are ready to use as stacks, just use =append()= and =pop()= methods.
+Maybe a dock type to hold this
+
+Python doesn't have a character type.  Indexing =str= just gives you a =str=
+with length of 1.
