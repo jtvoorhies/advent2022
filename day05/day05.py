@@ -4,7 +4,7 @@ from enum import Enum, auto
 import re
 
 # global variable to make functions more chatty for debugging
-verbose = False
+verbose = True
 
 
 class InputProvider(Enum):
@@ -79,6 +79,16 @@ class Dock:
         for x in range(0, count):
             cargo = self.stacks[fromStack - 1].pop()
             self.stacks[toStack - 1].append(cargo)
+
+    def movePart2(self, count: int, fromStack: int, toStack: int):
+        if verbose:
+            print("Dock.moveλ {0:>4d}, {1:>4d} ➙ {2:>4d}"\
+                  .format(count, fromStack, toStack))
+        # cargo = self.stacks[fromStack - 1].pop(-count)
+        # self.stacks[toStack - 1].extend(cargo)
+        cargo = self.stacks[fromStack - 1][-count:]
+        del self.stacks[fromStack - 1][-count:]
+        self.stacks[toStack - 1].extend(cargo)
 
     def prettyPrint(self):
         for level in range(self.maxStackHeight() - 1, -1, -1):
@@ -182,15 +192,19 @@ def solve(input, part=1) -> str:
         dock.prettyPrint()
     moveLines: [str] = splitByLines[splitLineIndex + 1:]
     moves = map(lambda l: Move.fromString(l), moveLines)
+    movefunc = Dock.move
+    if part == 2:
+        movefunc = Dock.movePart2
     for move in moves:
-        dock.move(move.count, move.fromStack, move.toStack)
+        # dock.move(move.count, move.fromStack, move.toStack)
+        movefunc(dock, move.count, move.fromStack, move.toStack)
         if verbose:
             dock.prettyPrint()
     return dock.topCrateInEachStack()
 
 
 # TODO: fill in example solution
-run(InputProvider.EXAMPLE, part=1, expectedSolution='CMZ')
-run(InputProvider.INPUTFILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=)
-# run(InputProvider.INPUTFILE, part=2)
+# run(InputProvider.EXAMPLE, part=1, expectedSolution='CMZ')
+# run(InputProvider.INPUTFILE, part=1)
+run(InputProvider.EXAMPLE, part=2, expectedSolution='MCD')
+run(InputProvider.INPUTFILE, part=2)
