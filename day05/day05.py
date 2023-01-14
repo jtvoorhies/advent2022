@@ -4,7 +4,7 @@ from enum import Enum, auto
 import re
 
 # global variable to make functions more chatty for debugging
-verbose = True
+verbose = False
 
 
 class InputProvider(Enum):
@@ -103,8 +103,10 @@ def makeDock(input: [str]) -> Dock:
     '''Creates an Dock instance out of the input strings from the top through
     to the numbered labels under the cargo.  Do not include the "move"
     lines.'''
+    if verbose:
+        print("makeDockλ parameter input:\n", input)
     labelLine = input.pop()
-    MATCHER = re.compile(' ([0-9]+)$')
+    MATCHER = re.compile(' ([0-9]+)\s*$')
     labelMatched = MATCHER.search(labelLine).group()[1]
     stackCount = int(labelMatched)
     if verbose:
@@ -189,6 +191,6 @@ def solve(input, part=1) -> str:
 
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution='CMZ')
-# run(InputProvider.INPUTFILE, part=1)
+run(InputProvider.INPUTFILE, part=1)
 # run(InputProvider.EXAMPLE, part=2, expectedSolution=)
 # run(InputProvider.INPUTFILE, part=2)
