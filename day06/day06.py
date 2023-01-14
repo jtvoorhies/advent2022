@@ -49,14 +49,17 @@ def run(inputProvider, part=1, expectedSolution=()):
 
 
 def solve(input, part=1) -> int:
-    windowEnd = 3   # the 4-character window to test for uniqueness.
+    markerWidth = 4
+    if part == 2:
+        markerWidth = 14
+    windowEnd = markerWidth - 1
     foundStartOfPacketMarker = False
     while not foundStartOfPacketMarker:
         windowEnd = windowEnd + 1
-        windowStart = windowEnd - 4
+        windowStart = windowEnd - markerWidth
         substring = input[windowStart : windowEnd]
         windowSet = set(substring)
-        if len(windowSet) == 4:
+        if len(windowSet) == markerWidth:
             foundStartOfPacketMarker = True
     return windowEnd
 
@@ -68,6 +71,10 @@ run(InputProvider.EXAMPLE2, part=1, expectedSolution=5)
 run(InputProvider.EXAMPLE3, part=1, expectedSolution=6)
 run(InputProvider.EXAMPLE4, part=1, expectedSolution=10)
 run(InputProvider.EXAMPLE5, part=1, expectedSolution=11)
-run(InputProvider.INPUTFILE, part=1)
-# run(InputProvider.EXAMPLE, part=2, expectedSolution=)
-# run(InputProvider.INPUTFILE, part=2)
+run(InputProvider.INPUTFILE, part=1, expectedSolution=1531)
+run(InputProvider.EXAMPLE1, part=2, expectedSolution=19)
+run(InputProvider.EXAMPLE2, part=2, expectedSolution=23)
+run(InputProvider.EXAMPLE3, part=2, expectedSolution=23)
+run(InputProvider.EXAMPLE4, part=2, expectedSolution=29)
+run(InputProvider.EXAMPLE5, part=2, expectedSolution=26)
+run(InputProvider.INPUTFILE, part=2)

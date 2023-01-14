@@ -62,3 +62,28 @@ To begin, [[./input.txt][get your puzzle input]].
 That's the right answer! You are one gold star closer to collecting enough star fruit. [[https://adventofcode.com/2022/day/6#part2][[Continue to Part Two]]]
 
 * Part 2
+Your device's communication system is correctly detecting packets, but still
+isn't working.  It looks like it also needs to look for /messages/.
+
+A /start-of-message marker/ is just like a start-of-packet marker, except it
+consists of /14 distinct characters/ rather than 4.
+
+Here are the first positions of start-of-message markers for all of the above
+examples:
+
+- =mjqjpqmgbljsphdztnvjfqwrcgsmlb=: first marker after character =19=
+- =bvwbjplbgvbhsrlpgdmjqwftvncz=: first marker after character =23=
+- =nppdvjthqldpwncqszvftbrmjlhg=: first marker after character =23=
+- =nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg=: first marker after character =29=
+- =zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw=: first marker after character =26=
+
+/How many characters need to be processed before the first start-of-message
+marker is detected?/
+
+** Solution
+=2518=
+That's the right answer! You are one gold star closer to collecting enough star fruit.
+
+You have completed Day 6! You can [Shareon
+[[https://twitter.com/intent/tweet?text=I+just+completed+%22Tuning+Trouble%22+%2D+Day+6+%2D+Advent+of+Code+2022&url=https%3A%2F%2Fadventofcode%2Ecom%2F2022%2Fday%2F6&related=ericwastl&hashtags=AdventOfCode][Twitter]]
+[[javascript:void(0);][Mastodon]]] this victory or [[https://adventofcode.com/2022][[Return to Your Advent Calendar]]].
