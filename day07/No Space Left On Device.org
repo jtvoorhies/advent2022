@@ -122,3 +122,17 @@ sum of the total sizes of those directories?/
 To begin, [[./input.txt][get your puzzle input]].
 
 ** Notes
+each input line:
+- $ change directory (dirName, =/=, =..=)
+- $ ls ()
+- dir x
+- <size> filename
+
+file hierarchy.
+- file (name, size)
+- dir (name, [contents])
+- pwd (points to dir)
+
+** Solution
+Swift: =1770595=
+Python: =1770595=
