@@ -138,19 +138,46 @@ $ ls
                 raise Exception("Bad parameter.")
 
 
+def getDirectoriesAtLeast(rootDir: Directory, spaceToFreeUp: int):
+    output = list()
+    if rootDir.getSize() >= spaceToFreeUp:
+        output.append(rootDir)
+    for node in rootDir.contents:
+        if type(node) is Directory:
+            output += getDirectoriesAtLeast(node, spaceToFreeUp)
+    return output
+
+
 def solve(input: str, part: int = 1) -> int:
     root = parse(input)
-    print("--------------------- Finished parsing input. ------------------")
-    # just test
-    root.prettyPrint()
-    dirsUnder100k = getDirectoriesUnder100000(root)
-    print("Directories < 100k:")
-    for d in dirsUnder100k:
-        print("    {0:>8}  {1}".format(d.getSize(), d.name))
-    dirsUnder100kSizes = map(lambda x: x.getSize(), dirsUnder100k)
-    sumDirsUnder100k = reduce(lambda lhs, rhs: lhs+rhs,
-                              dirsUnder100kSizes)
-    return sumDirsUnder100k
+    if part == 1:
+        print("--------------------- Finished parsing input. ------------------")
+        dirsUnder100k = getDirectoriesUnder100000(root)
+        print("Directories < 100k:")
+        for d in dirsUnder100k:
+            print("    {0:>8}  {1}".format(d.getSize(), d.name))
+        dirsUnder100kSizes = map(lambda x: x.getSize(), dirsUnder100k)
+        sumDirsUnder100k = reduce(lambda lhs, rhs: lhs+rhs,
+                                  dirsUnder100kSizes)
+        return sumDirsUnder100k
+    elif part == 2:
+        diskSpaceTotal = 70000000
+        updateSpaceNeeded = 30000000
+        spaceCurrentlyFree = diskSpaceTotal - root.getSize()
+        spaceToFreeUp = updateSpaceNeeded - spaceCurrentlyFree
+        print("--------------------- Finished parsing input. ------------------")
+        print("free space (total disk space - root.getSize()):", spaceCurrentlyFree)
+        print("space to free up (updateSpaceNeeded - free space):", spaceToFreeUp)
+        dirsAtLeastX = getDirectoriesAtLeast(root, spaceToFreeUp)
+        print("Directories at least {0}:".format(spaceToFreeUp))
+        for d in dirsAtLeastX:
+            print("    {0:>8}  {1}".format(d.getSize(), d.name))
+        minDir = min(dirsAtLeastX, key=Directory.getSize)
+        minDirSize = minDir.getSize()
+        print("The minumum directory is", minDir.name, "at size:", minDirSize)
+        # dirsAtLeastXSizes = map(lambda x: x.getSize(), dirsAtLeastX)
+        # sumDirs = reduce(lambda lhs, rhs: lhs+rhs, dirsAtLeastXSizes)
+        return minDirSize
 
 
 def run(input: str, part: int = 1, expectedSolution=()):
@@ -166,7 +193,7 @@ def run(input: str, part: int = 1, expectedSolution=()):
     print(solvedIcon, "answer:", foundSolution, expectedSolutionString)
 
 
-run(InputProvider.getInput(InputProvider.EXAMPLE), 1, 95437)
-run(InputProvider.getInput(InputProvider.FILE), 1)
-# run(InputProvider.getInput(InputProvider.EXAMPLE), 2, TODOpass)
-# run(InputProvider.getInput(InputProvider.FILE), 2)
+# run(InputProvider.getInput(InputProvider.EXAMPLE), 1, 95437)
+# run(InputProvider.getInput(InputProvider.FILE), 1, 1770595)
+# run(InputProvider.getInput(InputProvider.EXAMPLE), 2, 24933642)
+run(InputProvider.getInput(InputProvider.FILE), 2)

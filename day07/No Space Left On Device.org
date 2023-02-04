@@ -137,7 +137,8 @@ file hierarchy.
 Swift: =1770595=
 Python: =1770595=
 
-That's the right answer! You are one gold star closer to collecting enough star fruit. [[https://adventofcode.com/2022/day/7#part2][[Continue to Part Two]]]
+That's the right answer! You are one gold star closer to collecting enough star
+fruit. [[https://adventofcode.com/2022/day/7#part2][[Continue to Part Two]]]
 
 * Part 2
 Now, you're ready to choose a directory to delete.
@@ -166,4 +167,6 @@ these, choose the /smallest/: =d=, increasing unused space by =24933642=.
 Find the smallest directory that, if deleted, would free up enough space on the
 filesystem to run the update.  /What is the total size of that directory?/
 
-** Notes
+** Solution
+Python: =2195372=
+Swift: =2195372=
