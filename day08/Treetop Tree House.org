@@ -51,4 +51,5 @@ Consider your map; /how many trees are visible from outside the grid?/
 
 To begin, [[./input.txt][get your puzzle input]].
 
-** Notes
+** Solution
+Got =1681=

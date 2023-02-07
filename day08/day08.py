@@ -8,21 +8,10 @@ import itertools
 from more_itertools import grouper
 import array
 import sys
-import importlib.util
 
-spec = importlib.util.spec_from_file_location("sgr", "/home/jt/Developer/python/usr/lib/sgr.py")
-module = importlib.util.module_from_spec(spec)
-sys.modules['sgr'] = module
-spec.loader.exec_module(module)
-
-
-# print sgr
-# print("========= sgr dir(): ==========")
-# print(dir('sgr'))
-# exit(0)
 
 # global variable to make functions more chatty for debugging
-verbose = True
+verbose = False
 
 
 class InputProvider(Enum):
@@ -52,14 +41,15 @@ def run(inputProvider, part=1, expectedSolution=()):
         raise ValueError("parameter 'part' must be a one or two.")
     finishChar = "🏁"
     solutionUnderTest = solve(inputProvider.getInput(), part=part)
+    expectedSolutionStr = ''
     if expectedSolution != ():
+        expectedSolutionStr = '  expected: ' + str(expectedSolution)
         if expectedSolution == solutionUnderTest:
             finishChar = "✅"
         else:
             finishChar = "❌"
     print(finishChar, "Solution found:", solutionUnderTest,
-          "  expected:", str(expectedSolution), "\n")
-
+          expectedSolutionStr, "\n")
 
 
 class Direction(Enum):
@@ -88,6 +78,8 @@ class Coordinate:
         newX = self.x + other.x
         newY = self.y + other.y
         return Coordinate(newY, newX)
+    def __str__(self):
+        return "✦(y:{0},x:{1})".format(self.y, self.x)
 
 
 class TreeGrid:
@@ -96,20 +88,29 @@ class TreeGrid:
         self.height = height
         self.width = width
         self.grid = grid
+
     def makeIndex(self, coordinate) -> int:
         index = (coordinate.y * self.width) + coordinate.x
         assert index < len(self.grid)
         return index
+
     def __getitem__(self, coordinate):
         return self.grid[makeIndex(coordinate)]
+
     def __setitem__(self, coordinate, newValue):
         self.grid[makeIndex(coordinate)] = newValue
-    def areAllCoordsLessThan(self, coords: [Coordinate], treeCoord: Coordinate) -> bool:
-        treeHeight = self.grid[self.makeIndex(treeCoord)]
+
+    def areAllCoordsLessThan(self, coords: [Coordinate], treeHeight: int) -> bool:
+        if verbose:
+            coordStr = '[' + ','.join(map(lambda c: str(c), coords)) + ']'
+            print("λareAllCoordsLessThan treeHeight:", treeHeight, "coords:", coordStr)
+        output = True
         for c in coords:
             if self.grid[self.makeIndex(c)] >= treeHeight:
-                return False
-        return True
+                output = False
+                break
+        return output
+
     def isVisibleFromOutside(self, coordinate) -> bool:
         # is it on the edge?
         if (coordinate.x == 0) or (coordinate.x == (self.width - 1)):
@@ -117,20 +118,36 @@ class TreeGrid:
         if (coordinate.y == 0) or (coordinate.y == (self.height - 1)):
             return True
         # check heights
-        #   vertical
-        toTopEdgeYrange  = range(0, coordinate.y - 1)
+        toTopEdgeYrange  = range(0, coordinate.y)
         toTopEdge = list(map(lambda y: Coordinate(y, coordinate.x), toTopEdgeYrange))
-        toBotEdgeYrange  = range(coordinate.y + 1, self.height - 1)
+        toBotEdgeYrange  = range(coordinate.y + 1, self.height)
         toBotEdge = list(map(lambda y: Coordinate(y, coordinate.x), toBotEdgeYrange))
-        toWestEdgeXrange = range(0, coordinate.x - 1)
+        toWestEdgeXrange = range(0, coordinate.x)
         toWestEdge = list(map(lambda x: Coordinate(coordinate.y, x), toWestEdgeXrange))
-        toEastEdgeXrange = range(coordinate.x + 1, self.width - 1)
+        toEastEdgeXrange = range(coordinate.x + 1, self.width)
         toEastEdge = list(map(lambda x: Coordinate(coordinate.y, x), toEastEdgeXrange))
-        edgeGroups = [toTopEdge, toBotEdge, toWestEdge, toEastEdge]
+        edgeGroups = list()
+        for eg in [toTopEdge, toBotEdge, toWestEdge, toEastEdge]:
+            if len(eg) > 0:
+                edgeGroups.append(eg)
+        output = False
         for edgeGroup in edgeGroups:
-            if self.areAllCoordsLessThan(edgeGroup, coordinate):
-                return True
-        return False
+            if self.areAllCoordsLessThan(edgeGroup, self.grid[self.makeIndex(coordinate)]):
+                output = True
+        return output
+
+    # def visibilityOfTree(self, coordinate) -> int:
+    #     '''Returns 0 if tree is NOT visible.  1 if visible from interior, 2 if
+    #     visible because it's on an edge.'''
+    #     # Deal with the edges
+    #     if (coordinate.x == 0) or (coordinate.x == (self.width - 1)):
+    #         return 2
+    #     if (coordinate.y == 0) or (coordinate.y == (self.height - 1)):
+    #         return 2
+    #     # Now the interior
+    #     up = list(map(lambda y: Coordinate(y, coordinate.x),\
+    #                   range(0, coordinate.y)))
+
     def prettyPrint(self):
         chunks = list(grouper(self.grid, self.width))
         print("---- TREE GRID   w: {0}   h: {1} ----".format(self.width, self.height))
@@ -143,7 +160,6 @@ class TreeGrid:
         lines1to3Trimmed = map(lambda l: l[:maxLength], lines1to3)
         for l in lines1to3Trimmed:
             print(l)
-        #for chunk in chunks:
         for h in range(0, self.height):
             chunk = chunks[h]
             chars = map(lambda n: str(n), chunk)
@@ -173,6 +189,7 @@ integers.  0 = not visible, 1 = visible interior, 2 = visible because it's on an
         for row in grid:
             flattened.extend(row)
         return flattened
+
     def prettyPrintColor(self):
         # Escape Sequences
         fgWhite = "\u001B[38;5;7m"
@@ -180,19 +197,23 @@ integers.  0 = not visible, 1 = visible interior, 2 = visible because it's on an
         fgGreen = "\u001B[38;5;2m"
         fgCyan = "\u001B[38;5;6m"
         fgOff = "\u001B[39m"
+        bgGray = "\u001B[48;5;240m"
+        bgOff = "\u001B[49m"
         bold = "\u001B[1m"
         boldOff = "\u001B[22m"
 
         def format(treeHeight: int, visibility: int) -> str:
             start = ''
+            end = fgOff
             match visibility:
                 case 0:  # not visible
-                    start = fgWhite
+                    start = bgGray + fgWhite
+                    end = fgOff + bgOff
                 case 1:  # visible
                     start = fgYellow
                 case 2:  # visible on the edge
                     start = fgGreen
-            return start + str(treeHeight) + fgOff
+            return start + str(treeHeight) + end
 
         chunks = list(grouper(self.grid, self.width))
         print("---- TREE GRID   w: {0}   h: {1} ----".format(self.width, self.height))
@@ -202,12 +223,6 @@ integers.  0 = not visible, 1 = visible interior, 2 = visible because it's on an
         line2 = "{0}Y↓{1}  0    5    0    5    0    5    0{2}"\
             .format(fgCyan + bold, boldOff, fgOff)
         line3 = "  {0}┌────────────────────────────────{1}".format(fgCyan, fgOff)
-        # maxLength = 5 + self.width
-        # lines1to3 = [line1, line2, line3]
-        # lines1to3Trimmed = map(lambda l: l[:maxLength], lines1to3)
-        # line3 += fgOff
-        # for l in lines1to3Trimmed:
-        #     print(l)
         for l in [line1, line2, line3]:
             print(l)
 
@@ -215,9 +230,6 @@ integers.  0 = not visible, 1 = visible interior, 2 = visible because it's on an
 
         lines = list()
         for y in range(0, self.height):
-            # chunk = chunks[y]
-            # chars = map(lambda n: format(n), chunk)
-            # line = ''.join(chars)
             line = ''
             for x in range (0, self.width):
                 coord = Coordinate(y, x)
@@ -228,9 +240,14 @@ integers.  0 = not visible, 1 = visible interior, 2 = visible because it's on an
                 line += output
             lines.append(line)
 
-        for line in lines:
-            print('{0:<2}│'.format(y), line)
+        for y in range(0, len(lines)):
+            print('{1}{0:<2}│{2}'.format(y, fgCyan, fgOff), lines[y])
 
+        if verbose:
+            for i in range(0, len(vGrid), self.width):
+                  line = ''.join(map(lambda i: str(i), vGrid[i : i + self.width]))
+                  print('   ', line)
+            print('↑----- vGrid -----↑')
 
 
 def parse(input: str) -> TreeGrid:
@@ -262,23 +279,22 @@ def parse(input: str) -> TreeGrid:
 
 def solve(input: str, part=1) -> int:
     treeGrid = parse(input)
-    # TODO Write solution
-    treeGrid.prettyPrint()
-    print("---------------")
-    treeGrid.prettyPrintColor()
-    print("---------------")
+    # treeGrid.prettyPrint()
+    if verbose:
+        print()
+        treeGrid.prettyPrintColor()
+        print("---------------")
+
+    gridOfVisible = treeGrid.makeGridOfVisible()
     visibleCount = 0
-    for y in range(0, treeGrid.height):
-        for x in range(0, treeGrid.width):
-            c = Coordinate(y, x)
-            isVisible = treeGrid.isVisibleFromOutside(c)
-            if isVisible:
-                visibleCount += 1
+    for v in gridOfVisible:
+        if v > 0:
+            visibleCount += 1
     return visibleCount
 
 
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution=21)
-# run(InputProvider.INPUTFILE, part=1)
+run(InputProvider.INPUTFILE, part=1)
 # run(InputProvider.EXAMPLE, part=2, expectedSolution=)
 # run(InputProvider.INPUTFILE, part=2)
