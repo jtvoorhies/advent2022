@@ -106,9 +106,6 @@ class Coordinate:
     def __str__(self) -> str:
         return "✦(y:{0},x:{1})".format(self.y, self.x)
 
-    # def eq(lhs, rhs) -> bool:
-    #     return (lhs.x == rhs.x) and (lhs.y == rhs.y)
-
     def __eq__(self, other) -> bool:
         return (self.x == other.x) and (self.y == other.y)
 
@@ -138,8 +135,34 @@ Touching being adjacent (including diagonals) or overlap.'''
 
     def transform(self, transformer):
         '''Use another coordinate where y and x are the distances.'''
-        self.x += transformer.x
-        self.y += transformer.y
+        if type(transformer) is Coordinate:
+            self.x += transformer.x
+            self.y += transformer.y
+        elif type(transformer) is Distance:
+            self.x += transformer.dx
+            self.y += transformer.dy
+
+
+class Distance:
+
+    def __init__(self, dy: int, dx: int):
+        self.dy = dy
+        self.dx = dx
+
+    def manhattanDistance(self) -> int:
+        return abs(dy) + abs(dx)
+
+    def __str__(self):
+        return "⇅⇆(dy:{0},dx:{1})".format(self.dy, self.dx)
+
+    def __neg__(self):
+        return Distance(-self.dy, -self.dx)
+
+    @classmethod
+    def makeDistance(cls, lhsCoord: Coordinate, rhsCoord: Coordinate):
+        dy = lhsCoord.y - rhsCoord.y
+        dx = lhsCoord.x - rhsCoord.x
+        return Distance(dy, dx)
 
 
 def parse(input: str) -> [Motion]:
@@ -170,74 +193,41 @@ def solve(input, part=1) -> int:
         while stepsLeftInCurrentMotion > 0:
             # move head
             head.moveInDirection(motion.direction)
-            # check if tail needs move
-            # if not head.isTouching(tail):
-            # dy = head.y - tail.y
-            # dx = head.x - tail.x
-            # tailTransform = None    # Coordinate
-
-            # if (abs(dx) > 1) or (abs(dy) > 1):  # need to move tail
-            #     match (dy, dx):
-            #         case (diffy, 0) if diffy < -1:    # same column, diff rows
-            #             tailTransform = Coordinate(+1, 0)
-            #         case (diffy, 0) if diffy > 1:
-            #             tailTransform = Coordinate(-1, 0)
-            #         case (0, diffx) if diffx < -1:
-            #             tailTransform = Coordinate(0, 1)
-            #         case (0, diffx) if diffx > 1:
-            #             tailTransform = Coordinate(0, -1)
-            #         case [(-2, -1),  (-1, -2), (-2, -2)]:
-            #             tailTransform = Coordinate(1, 1)
-            #         case [(-2, 1),  (-1, 2), (-2, 2)]:
-            #             tailTransform = Coordinate(1, -1)
-            #         case [(2, -1),  (1, -2), (2, -2)]:
-            #             tailTransform = Coordinate(-1, 1)
-            #         case [(2, 1),  (1, 2), (2, 2)]:
-            #             tailTransform = Coordinate(-1, -1)
-            #         case (0, 0):                        # overlap
-            #             pass
-            #         case _:
-            #             print("ERROR.  Should be unreachable.  dy:{0}, dx:{1}"
-            #                   .format(dy, dx))
-
-            diff = Coordinate(head.y - tail.y, head.x - tail.x)
-            y: int
-            x: int
-
-            # TODO
-            # Bug is that if diif doesn't have a zero in either x or y then
-            # tail needs to move a diagonal.  But diff must have an x or y of
-            # absolute value greater than 1.
-            #
-            # if (abs(diff.x) > 1) … we move horizontal
-            # or (abs(diff.y) > 1) … we move vertical
-            # if (diff.x == 0) or (diff.y == 0):
-            #     pass
-            # else:
-            #     # move diagonal
-            # if diff.y < -1:
-            #     y = -1
-            # elif diff.y > 1:
-            #     y = 1
-            # else:
-            #     y = 0
-            # if diff.x < -1:
-            #     x = -1
-            # elif diff.x > 1:
-            #     x = 1
-            # else:
-            #     x = 0
-            # tailTransform: Coordinate
-            # if (y == 0) and (x == 0):
-            #     tailTransform = None
-            # else:
-            #     tailTransform = Coordinate(y, x)
-
-            # move tail and if tail move, add new coordinate to the set
-
-            match (abs(diff.y), abs(diff.x)):
-                case (2, _):
-                case (_, 2):
+            tailDistance = Distance.makeDistance(head, tail)
+            if verbose:
+                print("tailDistance:", tailDistance)
+            # we move at all
+            dy = tailDistance.dy
+            dx = tailDistance.dx
+            tailTransformDy: int
+            tailTransformDx: int
+            tailTransform: Distance
+            if (dy > 1) or (dx > 1):
+                # we move in straight line or diagonal
+                if dy == 0:                         # straight line horiz
+                    tailTransformDy = 0
+                    if dx < 0:
+                        tailTransformDx = -1
+                    elif dx > 0:
+                        tailTransformDx = 1
+                elif dx == 0:                       # straight line vert
+                    tailTransformDx = 0
+                    if dy < 0:
+                        tailTransformDy = -1
+                    elif dy > 0:
+                        tailTransformDy = 1
+                else:                               # we move diagonal
+                    if dx < 0:
+                        tailTransformDx = -1
+                    else:     # dx > 0:
+                        tailTransformDx = 1
+                    if dy < 0:
+                        tailTransformDy = -1
+                    else:    # dy > 0:
+                        tailTransformDy = 1
+                tailTransform = Distance(tailTransformDy, tailTransformDx)
+            else:
+                tailTransform = None
 
             if tailTransform:       # tailTransform is not 'None'
                 tail.transform(tailTransform)

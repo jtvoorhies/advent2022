@@ -118,3 +118,9 @@ any tree?/
 
 ** Notes
 =201684=
+
+That's the right answer! You are one gold star closer to collecting enough star fruit.
+
+You have completed Day 8! You can [Shareon
+[[https://twitter.com/intent/tweet?text=I+just+completed+%22Treetop+Tree+House%22+%2D+Day+8+%2D+Advent+of+Code+2022&url=https%3A%2F%2Fadventofcode%2Ecom%2F2022%2Fday%2F8&related=ericwastl&hashtags=AdventOfCode][Twitter]]
+[[javascript:void(0);][Mastodon]]] this victory or [[https://adventofcode.com/2022][[Return to Your Advent Calendar]]].
