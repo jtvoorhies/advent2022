@@ -1,9 +1,10 @@
 # Advent of Code
 
 from enum import Enum, auto
+from functools import reduce
 
 # global variable to make functions more chatty for debugging
-verbose = True
+verbose = False
 
 
 class InputProvider(Enum):
@@ -173,7 +174,7 @@ def run(inputProvider, part=1, expectedSolution=()):
     if (part < 1) or (part > 2):
         raise ValueError("parameter 'part' must be a one or two.")
     finishChar = "🏁"
-    solutionUnderTest = solvePart1(inputProvider.getInput())
+    solutionUnderTest = solvePart1(inputProvider.getInput(), part=part)
     if expectedSolution != ():
         if expectedSolution == solutionUnderTest:
             finishChar = "✅"
@@ -183,67 +184,55 @@ def run(inputProvider, part=1, expectedSolution=()):
           "  expected:", str(expectedSolution), "\n")
 
 
-def parseInput(input: str) -> list:
-    instructions = list()
-    for line in input.splitlines():
-        if line == "noop":
-            instructions.append(None)
-        elif line.startswith("addx "):
-            num = int(line[5:])
-            instructions.append(num)
-    return instructions
+def isInterestingCycle(n: int) -> bool:
+    return (n - 20) % 40 == 0
 
 
-def interestingCycle(cycleCount) -> bool:
-    if cycleCount == 0:
-        return False
-    if ((cycleCount - 20) % 40) == 0:
-        return True
-    else:
-        return False
-
-
-def addx(register: int, parameter: int) -> int:
-    return register + parameter
-
-
-def noop(register: int) -> int:
-    return register
-
-
-def solvePart1(input) -> int:
-    rx = 1
+def solvePart1(input, part=1) -> int:
+    splitByLine = input.splitlines()
+    regX = 1
     cycleCount = 0
     LAST_CYCLE = 220
-    cycleCountInstruction = 0
-    instructions = parseInput(input)
-    instructionPointer = 0
-    interestingRegisterValues = list()
+    instructionInputIndex = 1
+    instructionCycleCount = 0
+    instructionCyclesRequired = 1
+    signalStrengths = list()
+    instruction = lambda n: n
+    if splitByLine[0] == "noop":
+        pass
+    elif splitByLine[0].startswith("addx"):
+        parameter = int(splitByLine[0][5:])
+        instruction = lambda n: n + parameter
+        instructionCyclesRequired = 2
     while cycleCount < LAST_CYCLE:
-        if interestingCycle(cycleCount):
-            interestingRegisterValues.append(rx)
         cycleCount += 1
-        cycleCountInstruction += 1
-        currentInstruction = instructions[instructionPointer]
-        instructionRequiredCycles: int
-        currentInstructionFunction = ()
-        if currentInstruction:
-            instructionRequiredCycles = 2
-            currentInstructionFunction = addx
-        else:
-            instructionRequiredCycles = 1
-            currentInstructionFunction = noop
-        if cycleCountInstruction >= instructionRequiredCycles:
-            # apply function
-            rx = currentInstructionFunction(rx)
-            # start next instruction
-            instructionPointer += 1
-            cycleCountInstruction = 0
-
+        instructionCycleCount += 1
+        if isInterestingCycle(cycleCount):
+            signalStrengths.append(cycleCount * regX)
+            if verbose:
+                print("Cycle:", cycleCount)
+                print("signalStrengths:", signalStrengths)
+        if instructionCycleCount >= instructionCyclesRequired:
+            # apply instruction
+            # if verbose:
+            #     print("cycle #", cycleCount, "regX =", regX, " → ", instruction(regX))
+            regX = instruction(regX)
+            instructionCycleCount = 0
+            newInstructionString = splitByLine[instructionInputIndex]
+            if newInstructionString == "noop":
+                instruction = lambda n: n
+                instructionCyclesRequired = 1
+            elif newInstructionString.startswith("addx "):
+                parameter = int(newInstructionString[5:])
+                instruction = lambda n: n + parameter
+                instructionCyclesRequired = 2
+            instructionInputIndex += 1
+    output = reduce(lambda l, r: l + r, signalStrengths)
+    return output
 
 
 # TODO: fill in example solution
 run(InputProvider.EXAMPLE, part=1, expectedSolution=13140)
-# run(InputProvider.INPUTFILE, part=1)
+run(InputProvider.INPUTFILE, part=1, expectedSolution=13480)
 # run(InputProvider.EXAMPLE, part=2, expectedSolution=)
 # run(InputProvider.INPUTFILE, part=2)

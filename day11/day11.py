@@ -1,6 +1,7 @@
 # Advent of Code
 
 from enum import Enum, auto
+import re
 
 # global variable to make functions more chatty for debugging
 verbose = True
@@ -62,6 +63,49 @@ def run(inputProvider, part=1, expectedSolution=()):
             finishChar = "❌"
     print(finishChar, "Solution found:", solutionUnderTest,
           "  expected:", str(expectedSolution), "\n")
+
+
+
+class Monkey:
+    def __init__(self, id: int, items: [int], operation, ifDivisibleBy: int,
+                 ifTestTrue: int, ifTestFalse: int):
+        self.id = id
+        self.items = items
+        self.operation = operation
+        self.ifDivisibleBy = ifDivisibleBy
+        self.ifTestTrue = ifTestTrue
+        self.ifTestFalse = ifTestFalse
+
+    def relief(worry: int) -> int:
+        # floor division returns an int
+        return worry // 3
+
+
+def parseMonkey(input: str) -> Monkey:
+    # matchMonkeyId = re.compile("^Monkey ([0-9]+):")
+    # matchItems = re.compile("^\s+Starting items: ([0-9]+(, )?)*")
+    # matchOperation = re.compile("^\s+Operation: new = old ([+*]) ([0-9old]+)")
+    # matchIfDivisibleBy = re.compile("^\s+Test: divisible by ([0-9]+)")
+    # matchIfTestTrue = re.compile("^\s+If true: throw to monkey ([0-9]+)")
+    # matchIfTestFalse = re.compile("^\s+If false: throw to monkey ([0-9]+)")
+    # id = matchMonkeyId.search(input)
+    # items = matchItems.search(input)
+    # operation = matchItems.search(input)
+    # ifDivisibleBy = matchIfDivisiFalse.search(input)
+    # ifTestTrue = matchIfTestTrue.search(input)
+    # ifTestFalse = matchIfTestFalse.search(input)
+    monkeyMatch = re.compile("""
+Monkey (?P<id>[0-9]+):
+  Starting items: (?P<itemsList>[0-9, ]+)
+  Operation: new = old (?P<opOperator>[+*]) (?P=<opValue>([0-9]+|old))
+  Test: divisible by (?P<ifDivisibleBy>[0-9]+)
+    If true: throw to monkey (?P<ifTestTrue>[0-9]+)
+    If false: throw to monkey (?P<ifTestFalse>[0-9]+)
+""")
+
+
+def parse(input: str) -> [Monkey]:
+    pass
 
 
 def solve(input, part=1) -> int:
