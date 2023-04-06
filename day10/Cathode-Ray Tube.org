@@ -384,3 +384,9 @@ your CRT?/
 
 ** Solution
 =EGJBGCFK=
+
+That's the right answer! You are one gold star closer to collecting enough star fruit.
+
+You have completed Day 10! You can [Shareon
+[[https://twitter.com/intent/tweet?text=I+just+completed+%22Cathode%2DRay+Tube%22+%2D+Day+10+%2D+Advent+of+Code+2022&url=https%3A%2F%2Fadventofcode%2Ecom%2F2022%2Fday%2F10&related=ericwastl&hashtags=AdventOfCode][Twitter]]
+[[javascript:void(0);][Mastodon]]] this victory or [[https://adventofcode.com/2022][[Return to Your Advent Calendar]]].
